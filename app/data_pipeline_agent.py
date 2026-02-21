@@ -123,6 +123,9 @@ class LLMBuildOrchestrator:
                 "source": profile.source,
             },
             "weight_bundle": {
+                "has_full_checkpoint": bundle.has_full_checkpoint,
+                "architecture_match": bundle.architecture_match,
+                "tokenizer_included": bundle.tokenizer_included,
                 "provided_layers": bundle.provided_layers,
                 "total_layers": bundle.total_layers,
                 "coverage": round(bundle.layer_coverage, 3),

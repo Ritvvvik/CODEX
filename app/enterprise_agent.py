@@ -78,27 +78,27 @@ class EnterpriseLLMAgent:
             tier = FeasibilityTier.HIGH
             mode = DeploymentMode.DEPLOY_AND_ADAPT
             recommendations = [
-                "Load the checkpoint in a compatibility-verified serving stack.",
-                "Run targeted supervised fine-tuning with enterprise tasks.",
-                "Enable RAG, policy controls, and rollout canaries.",
+                "Load checkpoint in a compatibility-verified serving stack.",
+                "Fine-tune on enterprise tasks with guarded rollout.",
+                "Enable retrieval and policy controls before full launch.",
             ]
             risk_level = "low"
         elif coverage >= 0.4 and bundle.architecture_match:
             tier = FeasibilityTier.MEDIUM
             mode = DeploymentMode.PARTIAL_MERGE
             recommendations = [
-                "Merge partial weights/adapters with shape and format checks.",
-                "Continue fine-tuning from a known stable base model.",
-                "Gate deployment with regression, safety, and hallucination evals.",
+                "Merge compatible partial weights/adapters with shape checks.",
+                "Continue fine-tuning from a stable base model.",
+                "Gate releases using regression and safety evaluation suites.",
             ]
             risk_level = "medium"
         else:
             tier = FeasibilityTier.LOW
             mode = DeploymentMode.BASE_MODEL_FIRST
             recommendations = [
-                "Start from a stable base model with enterprise licensing fit.",
-                "Use LoRA/QLoRA to specialize with approved enterprise datasets.",
-                "Rely on secure retrieval pipelines for current enterprise knowledge.",
+                "Start from a licensed stable base model.",
+                "Use LoRA/QLoRA with enterprise data for specialization.",
+                "Back responses with secure retrieval for freshness and control.",
             ]
             risk_level = "high"
 

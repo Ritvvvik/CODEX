@@ -15,10 +15,12 @@ class DataPipelineAgentTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             dataset_path = Path(tmp_dir) / "kb.jsonl"
             dataset_path.write_text(
-                '\n'.join([
-                    json.dumps({"text": "policy one", "label": "finance"}),
-                    json.dumps({"text": "policy two", "label": "legal"}),
-                ]),
+                "\n".join(
+                    [
+                        json.dumps({"text": "policy one", "label": "finance"}),
+                        json.dumps({"text": "policy two", "label": "legal"}),
+                    ]
+                ),
                 encoding="utf-8",
             )
             profile = self.agent.profile_dataset(str(dataset_path))
@@ -38,7 +40,7 @@ class DataPipelineAgentTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             dataset_path = Path(tmp_dir) / "kb.csv"
             dataset_path.write_text(
-                "text,label\n" "retention policy document,policy\n" "on-call runbook,ops\n",
+                "text,label\nretention policy document,policy\non-call runbook,ops\n",
                 encoding="utf-8",
             )
             result = LLMBuildOrchestrator().run(str(dataset_path), total_layers=32)
@@ -46,6 +48,7 @@ class DataPipelineAgentTests(unittest.TestCase):
         self.assertIn("dataset_profile", result)
         self.assertIn("weight_bundle", result)
         self.assertIn("llm_assessment", result)
+        self.assertIn("architecture_match", result["weight_bundle"])
         self.assertGreaterEqual(result["weight_bundle"]["provided_layers"], 1)
 
 

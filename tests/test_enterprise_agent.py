@@ -49,12 +49,7 @@ class EnterpriseAgentTests(unittest.TestCase):
 
     def test_weight_validation_rejects_invalid_layers(self) -> None:
         with self.assertRaises(ValidationError):
-            WeightBundle.from_dict(
-                {
-                    "provided_layers": 50,
-                    "total_layers": 40,
-                }
-            )
+            WeightBundle.from_dict({"provided_layers": 50, "total_layers": 40})
 
     def test_read_payloads_from_json_file_list(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

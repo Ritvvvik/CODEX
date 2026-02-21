@@ -1,34 +1,34 @@
 # Enterprise LLM Agent App
 
-Production-oriented Python agents for enterprise onboarding:
-1. Weight feasibility assessment.
-2. Dataset/knowledge-base to weight-bundle orchestration.
+Production-oriented Python toolkit for enterprise LLM onboarding with two agent flows:
 
-## Features
+1. **Weight-first flow**: evaluate enterprise-provided model weights/checkpoints.
+2. **Data-first flow**: ingest enterprise knowledge base/datasets, synthesize weight metadata, and pass into the main LLM assessor.
 
-- Strict validation for weight metadata.
-- Feasibility classification (`high` / `medium` / `low`) with deployment mode.
-- Production controls in output (eval gates, observability, rollback, model registry).
-- Dataset pipeline that profiles `.csv`/`.jsonl`, synthesizes weight-bundle metadata, and feeds it to the main LLM assessment agent.
+## Repository components
 
-## Run main feasibility agent
+- `app/enterprise_agent.py`: main feasibility and deployment-mode assessor.
+- `app/data_pipeline_agent.py`: dataset profiling + weight synthesis + orchestration.
+- `docs/enterprise-llm-plan.md`: architecture and rollout guidance.
+- `tests/`: unit tests for both flows.
+
+## Run: weight-first assessment
 
 ```bash
 python -m app.enterprise_agent --weights '{"has_full_checkpoint":true,"architecture_match":true,"tokenizer_included":true,"provided_layers":32,"total_layers":32}'
 ```
 
-## Run dataset → weights → LLM orchestration
+## Run: data-first orchestration (dataset -> weight metadata -> LLM assessor)
 
 ```bash
 python -m app.data_pipeline_agent --dataset enterprise_kb.jsonl --total-layers 40 --output build_report.json
 ```
 
-This orchestrator:
-- Reads enterprise dataset/knowledge-base datapoints,
-- Profiles data quality/scale,
-- Synthesizes training-ready weight bundle metadata,
-- Passes that bundle into the main LLM feasibility engine,
-- Emits training plan + assessment output.
+The data-first pipeline performs:
+- dataset profiling (sample count, average text length, supervision availability),
+- weight metadata synthesis,
+- training-plan proposal,
+- final feasibility assessment by the main enterprise agent.
 
 ## Test
 
