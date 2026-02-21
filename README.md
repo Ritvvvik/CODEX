@@ -1,27 +1,34 @@
 # Enterprise LLM Agent App
 
-Production-oriented Python agent that evaluates whether enterprise-provided model weights are sufficient for adaptation and returns rollout guidance for small-enterprise scale deployments.
+Production-oriented Python agents for enterprise onboarding:
+1. Weight feasibility assessment.
+2. Dataset/knowledge-base to weight-bundle orchestration.
 
 ## Features
 
-- Strict input validation for weight metadata.
+- Strict validation for weight metadata.
 - Feasibility classification (`high` / `medium` / `low`) with deployment mode.
 - Production controls in output (eval gates, observability, rollback, model registry).
-- Supports single payload (`--weights`) or batch processing via JSON file (`--weights-file`).
+- Dataset pipeline that profiles `.csv`/`.jsonl`, synthesizes weight-bundle metadata, and feeds it to the main LLM assessment agent.
 
-## Run (single payload)
+## Run main feasibility agent
 
 ```bash
 python -m app.enterprise_agent --weights '{"has_full_checkpoint":true,"architecture_match":true,"tokenizer_included":true,"provided_layers":32,"total_layers":32}'
 ```
 
-## Run (batch file)
+## Run dataset → weights → LLM orchestration
 
 ```bash
-python -m app.enterprise_agent --weights-file weights.json --output plans.md
+python -m app.data_pipeline_agent --dataset enterprise_kb.jsonl --total-layers 40 --output build_report.json
 ```
 
-`weights.json` can be either a single JSON object or an array of objects.
+This orchestrator:
+- Reads enterprise dataset/knowledge-base datapoints,
+- Profiles data quality/scale,
+- Synthesizes training-ready weight bundle metadata,
+- Passes that bundle into the main LLM feasibility engine,
+- Emits training plan + assessment output.
 
 ## Test
 
