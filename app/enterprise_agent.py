@@ -39,6 +39,9 @@ class WeightBundle:
 
     @classmethod
     def from_dict(cls, payload: dict[str, Any]) -> "WeightBundle":
+        if not isinstance(payload, dict):
+            raise ValidationError("weight payload must be a JSON object")
+
         try:
             provided_layers = int(payload.get("provided_layers", 0))
             total_layers = int(payload.get("total_layers", 0))
@@ -46,9 +49,9 @@ class WeightBundle:
             raise ValidationError("provided_layers and total_layers must be integers") from error
 
         bundle = cls(
-            has_full_checkpoint=bool(payload.get("has_full_checkpoint", False)),
-            architecture_match=bool(payload.get("architecture_match", False)),
-            tokenizer_included=bool(payload.get("tokenizer_included", False)),
+            has_full_checkpoint=_parse_bool(payload.get("has_full_checkpoint", False), "has_full_checkpoint"),
+            architecture_match=_parse_bool(payload.get("architecture_match", False), "architecture_match"),
+            tokenizer_included=_parse_bool(payload.get("tokenizer_included", False), "tokenizer_included"),
             provided_layers=provided_layers,
             total_layers=total_layers,
         )
@@ -155,6 +158,18 @@ def _read_payloads(args: argparse.Namespace) -> list[dict[str, Any]]:
     if isinstance(data, list) and all(isinstance(item, dict) for item in data):
         return data
     raise ValidationError("weights file must contain either a JSON object or a list of JSON objects")
+
+
+def _parse_bool(value: Any, field_name: str) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"true", "1", "yes"}:
+            return True
+        if normalized in {"false", "0", "no"}:
+            return False
+    raise ValidationError(f"{field_name} must be a boolean")
 
 
 def main() -> None:

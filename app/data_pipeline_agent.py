@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -37,7 +38,7 @@ class DatasetToWeightsAgent:
         if not rows:
             raise ValidationError("Dataset is empty")
 
-        texts = [str(row.get(text_field, "")) for row in rows if str(row.get(text_field, "")).strip()]
+        texts = [str(row.get(text_field, "")).strip() for row in rows if str(row.get(text_field, "")).strip()]
         if not texts:
             raise ValidationError(f"No usable '{text_field}' field values found")
 
@@ -60,7 +61,7 @@ class DatasetToWeightsAgent:
         supervision_bonus = 0.15 if profile.has_labels else 0.0
 
         coverage_score = min(0.05 + (0.5 * sample_score) + (0.3 * richness_score) + supervision_bonus, 1.0)
-        provided_layers = max(1, int(round(total_layers * coverage_score)))
+        provided_layers = max(1, math.ceil(total_layers * coverage_score))
 
         return WeightBundle(
             has_full_checkpoint=False,
@@ -91,7 +92,10 @@ class DatasetToWeightsAgent:
             line = line.strip()
             if not line:
                 continue
-            item = json.loads(line)
+            try:
+                item = json.loads(line)
+            except json.JSONDecodeError as error:
+                raise ValidationError(f"Invalid JSONL row in {path}: {line[:80]}") from error
             if isinstance(item, dict):
                 rows.append(item)
         return rows

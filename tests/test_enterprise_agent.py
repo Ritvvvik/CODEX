@@ -4,7 +4,12 @@ import unittest
 from argparse import Namespace
 from pathlib import Path
 
-from app.enterprise_agent import EnterpriseLLMAgent, ValidationError, WeightBundle, _read_payloads
+from app.enterprise_agent import (
+    EnterpriseLLMAgent,
+    ValidationError,
+    WeightBundle,
+    _read_payloads,
+)
 
 
 class EnterpriseAgentTests(unittest.TestCase):
@@ -50,6 +55,33 @@ class EnterpriseAgentTests(unittest.TestCase):
     def test_weight_validation_rejects_invalid_layers(self) -> None:
         with self.assertRaises(ValidationError):
             WeightBundle.from_dict({"provided_layers": 50, "total_layers": 40})
+
+
+    def test_weight_validation_rejects_non_boolean_flags(self) -> None:
+        with self.assertRaises(ValidationError):
+            WeightBundle.from_dict(
+                {
+                    "has_full_checkpoint": "maybe",
+                    "architecture_match": True,
+                    "tokenizer_included": False,
+                    "provided_layers": 4,
+                    "total_layers": 8,
+                }
+            )
+
+    def test_weight_validation_accepts_boolean_strings(self) -> None:
+        bundle = WeightBundle.from_dict(
+            {
+                "has_full_checkpoint": "true",
+                "architecture_match": "1",
+                "tokenizer_included": "no",
+                "provided_layers": 4,
+                "total_layers": 8,
+            }
+        )
+        self.assertTrue(bundle.has_full_checkpoint)
+        self.assertTrue(bundle.architecture_match)
+        self.assertFalse(bundle.tokenizer_included)
 
     def test_read_payloads_from_json_file_list(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

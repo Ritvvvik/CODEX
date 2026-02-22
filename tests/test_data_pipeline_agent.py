@@ -36,6 +36,13 @@ class DataPipelineAgentTests(unittest.TestCase):
             with self.assertRaises(ValidationError):
                 self.agent.profile_dataset(str(dataset_path))
 
+    def test_profile_rejects_invalid_jsonl_row(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            dataset_path = Path(tmp_dir) / "kb.jsonl"
+            dataset_path.write_text('{"text": "valid"}\n{invalid-json}\n', encoding="utf-8")
+            with self.assertRaises(ValidationError):
+                self.agent.profile_dataset(str(dataset_path))
+
     def test_orchestrator_runs_end_to_end(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             dataset_path = Path(tmp_dir) / "kb.csv"
