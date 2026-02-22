@@ -30,6 +30,18 @@ The data-first pipeline performs:
 - training-plan proposal,
 - final feasibility assessment by the main enterprise agent.
 
+
+## Run: web frontend
+
+```bash
+python -m app.web_app --host 0.0.0.0 --port 8000
+```
+
+Then open `http://localhost:8000` for:
+- weight-first feasibility form,
+- data-first dataset orchestration form (paste JSONL/CSV directly),
+- JSON result viewer.
+
 ## Test
 
 ```bash
